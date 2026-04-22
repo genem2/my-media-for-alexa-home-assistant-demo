@@ -195,13 +195,6 @@ homeassistant/automations/mymedia_webhook_receiver.yaml
 
 # Step 3 — Add Alexa Command Script
 
-## Included Files
-
-- [Helpers](homeassistant/helpers.md)
-- [Webhook Automation](homeassistant/automations/mymedia_webhook_receiver.yaml)
-- [Alexa Command Script](homeassistant/scripts/issue_alexa_command.yaml)
-- [Dashboard Card](homeassistant/lovelace/mymedia_dashboard_card.yaml)
-
 Used to send commands such as:
 
 ```text
@@ -211,8 +204,6 @@ resume
 next
 stop
 ```
-
----
 
 # Step 4 — Add Lovelace Card
 
@@ -266,7 +257,6 @@ Displays:
 ## Artwork Refresh
 
 Artwork URLs may be cached by browsers.
-
 This example appends a timestamp query string to force refresh.
 
 ## Device Names
@@ -277,12 +267,10 @@ Use whatever Alexa device names your existing HA script supports.
 
 # Included Files
 
-```text
-homeassistant/
-├── automations/
-├── scripts/
-├── lovelace/
-```
+- [Helpers](homeassistant/helpers.md)
+- [Webhook Automation](homeassistant/automations/mymedia_webhook_receiver.yaml)
+- [Alexa Command Script](homeassistant/scripts/issue_alexa_command.yaml)
+- [Dashboard Card](homeassistant/lovelace/mymedia_dashboard_card.yaml)
 
 ---
 

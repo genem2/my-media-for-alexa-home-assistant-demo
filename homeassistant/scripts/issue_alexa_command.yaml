@@ -1,1 +1,40 @@
 
+alias: issue_alexa_command
+description: Send a text command to an Alexa Media Player device
+mode: queued
+max: 3
+icon: mdi:account-voice
+
+fields:
+  command:
+    required: true
+  device:
+    required: true
+  seconds_delay_afterwards:
+    required: false
+
+sequence:
+  - variables:
+      command: "{{ command | default('', true) }}"
+      raw_device: "{{ device | default('media_player.oak', true) }}"
+      target_device: >
+        {% set d = raw_device | string | trim %}
+        {{ d if d.startswith('media_player.') else 'media_player.' ~ d }}
+      seconds_delay_afterwards: "{{ seconds_delay_afterwards | default(10, true) }}"
+
+  - if:
+      - condition: template
+        value_template: "{{ command | trim == '' }}"
+    then:
+      - stop: Missing command
+
+  - action: media_player.play_media
+    target:
+      entity_id: "{{ target_device }}"
+    data:
+      media:
+        media_content_id: "{{ command }}"
+        media_content_type: custom
+
+  - delay:
+      seconds: "{{ seconds_delay_afterwards | int(10) }}"

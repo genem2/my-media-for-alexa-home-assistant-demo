@@ -1,4 +1,5 @@
 # My Media for Alexa + Home Assistant Demo
+<img width="572" height="323" alt="image" src="https://github.com/user-attachments/assets/91871b7b-9100-45a8-b0a0-768ddba92583" />
 
 A community example showing how to integrate **[My Media for Alexa](https://www.mymediaalexa.com/)** [webhook events](https://bizmodeller-docs--1-3-153-4-3xdaagpb.web.app/my-media-for-alexa/webhook.html) with **Home Assistant** to create a polished dashboard experience.
 
@@ -11,11 +12,27 @@ This project demonstrates how to use webhook playback events to power a Lovelace
 * Pause / Resume / Next / Stop buttons
 * Alexa device selection
 
+## What This Solves
+
+Home Assistant can launch Alexa commands, but My Media webhook events now make it possible to build a true dashboard showing:
+
+- now playing
+- artwork
+- playback state
+- quick controls
+
+
+Special thanks to the My Media for Alexa developer for adding webhook support.
+
 ---
 
-## Screenshot
-<img width="572" height="323" alt="image" src="https://github.com/user-attachments/assets/91871b7b-9100-45a8-b0a0-768ddba92583" />
+## Quick Start
 
+1. Enable My Media webhook support
+2. Import helpers
+3. Add webhook automation
+4. Add command script
+5. Paste Lovelace card
 
 ---
 
@@ -276,12 +293,5 @@ homeassistant/
 
 ---
 
-# License
-
-MIT
-
----
-
-# Repository
-
-https://github.com/genem2/my-media-for-alexa-home-assistant-demo
+![Home Assistant](https://img.shields.io/badge/Home%20Assistant-Compatible-blue)
+![License](https://img.shields.io/badge/license-MIT-green)

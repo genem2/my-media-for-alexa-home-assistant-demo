@@ -1,1 +1,160 @@
-
+alias: My Media webhook receiver
+description: ""
+triggers:
+  - webhook_id: mymedia_webhook
+    allowed_methods:
+      - POST
+    local_only: false
+    trigger: webhook
+actions:
+  - target:
+      entity_id: input_text.mymedia_last_event
+    data:
+      value: "{{ event_name }}"
+    action: input_text.set_value
+  - target:
+      entity_id: input_datetime.mymedia_event_time
+    data:
+      datetime: >
+        {% set ts = as_datetime(event_ts, default=now()) %} {{
+        ts.strftime('%Y-%m-%d %H:%M:%S') }}
+    action: input_datetime.set_datetime
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: "{{ event_name == 'playlist_start' }}"
+        sequence:
+          - target:
+              entity_id: input_text.mymedia_playlist
+            data:
+              value: "{{ data.playlist | default('unknown') }}"
+            action: input_text.set_value
+          - target:
+              entity_id: input_boolean.mymedia_playing
+            action: input_boolean.turn_on
+          - target:
+              entity_id:
+                - input_boolean.mymedia_paused
+                - input_boolean.mymedia_failed
+            action: input_boolean.turn_off
+      - conditions:
+          - condition: template
+            value_template: "{{ event_name == 'track_start' }}"
+        sequence:
+          - target:
+              entity_id: input_text.mymedia_track
+            data:
+              value: "{{ data.track | default('unknown') }}"
+            action: input_text.set_value
+          - target:
+              entity_id: input_text.mymedia_title
+            data:
+              value: "{{ data.track | default('unknown') }}"
+            action: input_text.set_value
+          - target:
+              entity_id: input_text.mymedia_artist
+            data:
+              value: "{{ data.artist | default('unknown') }}"
+            action: input_text.set_value
+          - target:
+              entity_id: input_text.mymedia_album
+            data:
+              value: "{{ data.album | default('unknown') }}"
+            action: input_text.set_value
+          - target:
+              entity_id: input_text.mymedia_playlist
+            data:
+              value: "{{ data.playlist | default('unknown') }}"
+            action: input_text.set_value
+          - target:
+              entity_id: input_text.mymedia_device
+            data:
+              value: "{{ data.device | default('unknown') }}"
+            action: input_text.set_value
+          - target:
+              entity_id: input_text.mymedia_artwork_url
+            data:
+              value: "{{ (data.artwork_url | default(''))[:255] }}"
+            action: input_text.set_value
+          - target:
+              entity_id: input_text.mymedia_error
+            data:
+              value: ""
+            action: input_text.set_value
+          - target:
+              entity_id: input_boolean.mymedia_playing
+            action: input_boolean.turn_on
+          - target:
+              entity_id:
+                - input_boolean.mymedia_paused
+                - input_boolean.mymedia_failed
+            action: input_boolean.turn_off
+      - conditions:
+          - condition: template
+            value_template: "{{ event_name == 'track_paused' }}"
+        sequence:
+          - target:
+              entity_id: input_boolean.mymedia_paused
+            action: input_boolean.turn_on
+          - target:
+              entity_id: input_boolean.mymedia_playing
+            action: input_boolean.turn_off
+      - conditions:
+          - condition: template
+            value_template: >-
+              {{ event_name in ['track_stopped', 'track_finished',
+              'playlist_finished'] }}
+        sequence:
+          - target:
+              entity_id:
+                - input_boolean.mymedia_playing
+                - input_boolean.mymedia_paused
+            action: input_boolean.turn_off
+      - conditions:
+          - condition: template
+            value_template: "{{ event_name == 'track_failed' }}"
+        sequence:
+          - target:
+              entity_id: input_text.mymedia_track
+            data:
+              value: "{{ data.track | default('unknown') }}"
+            action: input_text.set_value
+          - target:
+              entity_id: input_text.mymedia_title
+            data:
+              value: "{{ data.track | default('unknown') }}"
+            action: input_text.set_value
+          - target:
+              entity_id: input_text.mymedia_artist
+            data:
+              value: "{{ data.artist | default('unknown') }}"
+            action: input_text.set_value
+          - target:
+              entity_id: input_text.mymedia_album
+            data:
+              value: "{{ data.album | default('unknown') }}"
+            action: input_text.set_value
+          - target:
+              entity_id: input_text.mymedia_artwork_url
+            data:
+              value: "{{ (data.artwork_url | default(''))[:255] }}"
+            action: input_text.set_value
+          - target:
+              entity_id: input_text.mymedia_error
+            data:
+              value: "{{ data.error_code | default('failed') }}"
+            action: input_text.set_value
+          - target:
+              entity_id: input_boolean.mymedia_failed
+            action: input_boolean.turn_on
+          - target:
+              entity_id:
+                - input_boolean.mymedia_playing
+                - input_boolean.mymedia_paused
+            action: input_boolean.turn_off
+mode: queued
+variables:
+  payload: "{{ trigger.json | default({}) }}"
+  event_name: "{{ payload.event | default('unknown') }}"
+  data: "{{ payload.data | default({}) }}"
+  event_ts: "{{ payload.timestamp | default(now().isoformat()) }}"

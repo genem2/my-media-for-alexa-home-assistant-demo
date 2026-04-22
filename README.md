@@ -195,11 +195,12 @@ homeassistant/automations/mymedia_webhook_receiver.yaml
 
 # Step 3 — Add Alexa Command Script
 
-This repo includes:
+## Included Files
 
-```text
-homeassistant/scripts/issue_alexa_command.yaml
-```
+- [Helpers](homeassistant/helpers.md)
+- [Webhook Automation](homeassistant/automations/mymedia_webhook_receiver.yaml)
+- [Alexa Command Script](homeassistant/scripts/issue_alexa_command.yaml)
+- [Dashboard Card](homeassistant/lovelace/mymedia_dashboard_card.yaml)
 
 Used to send commands such as:
 

@@ -1,7 +1,9 @@
 # My Media for Alexa + Home Assistant Demo
+![Home Assistant](https://img.shields.io/badge/Home%20Assistant-Compatible-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
 <img width="572" height="323" alt="image" src="https://github.com/user-attachments/assets/91871b7b-9100-45a8-b0a0-768ddba92583" />
 
-A community example showing how to integrate **[My Media for Alexa](https://www.mymediaalexa.com/)** [webhook events](https://bizmodeller-docs--1-3-153-4-3xdaagpb.web.app/my-media-for-alexa/webhook.html) with **Home Assistant** to create a polished dashboard experience.
+A community example showing how to integrate **[My Media for Alexa](...)** webhook events into **Home Assistant** to create a polished dashboard experience.
 
 This project demonstrates how to use webhook playback events to power a Lovelace dashboard card with:
 
@@ -64,10 +66,19 @@ Most users will already have one of these options:
 * Other Alexa TTS / command workflow
 
 ---
+## Includes
+
+- [helpers.md](homeassistant/helpers.md)
+- [Webhook Automation](homeassistant/automations/mymedia_webhook_receiver.yaml)
+- [Alexa Command Script](homeassistant/scripts/issue_alexa_command.yaml)
+- [Dashboard Card](homeassistant/lovelace/mymedia_dashboard_card.yaml)
+- [Screenshots](screenshots/)
+
+---
 
 ## How It Works
 
-## 1. My Media sends webhook events
+### 1. My Media sends webhook events
 
 Examples:
 
@@ -78,7 +89,7 @@ Examples:
 * `stop`
 * `error`
 
-## 2. Home Assistant automation receives webhook
+### 2. Home Assistant automation receives webhook
 
 Webhook endpoint:
 
@@ -86,7 +97,7 @@ Webhook endpoint:
 /api/webhook/mymedia_webhook
 ```
 
-## 3. Automation stores event data in helpers
+### 3. Automation stores event data in helpers
 
 Examples:
 
@@ -96,17 +107,17 @@ Examples:
 * artwork URL
 * playback state
 
-## 4. Lovelace card displays everything live
+### 4. Lovelace card displays everything live
 
 ---
 
-# Setup
+## Setup
 
-## Step 1 — Create Helpers
+### Step 1 — Create Helpers
 
 Create these helpers in Home Assistant.
 
-## Input Boolean
+### Input Boolean
 
 ```text
 input_boolean.mymedia_playing
@@ -114,7 +125,7 @@ input_boolean.mymedia_paused
 input_boolean.mymedia_failed
 ```
 
-## Input Text
+### Input Text
 
 ```text
 input_text.mymedia_track
@@ -133,7 +144,7 @@ Recommended max length:
 * artwork URL = 255
 * most others = 100 to 120
 
-## Input Select
+### Input Select
 
 ```text
 input_select.mymedia_mode
@@ -165,7 +176,7 @@ house
 
 Use names your Alexa command service expects.
 
-## Input Datetime
+### Input Datetime
 
 ```text
 input_datetime.mymedia_event_time
@@ -173,7 +184,7 @@ input_datetime.mymedia_event_time
 
 ---
 
-# Step 2 — Add Webhook Automation
+### Step 2 — Add Webhook Automation
 
 Create an automation that listens for:
 
@@ -193,7 +204,7 @@ homeassistant/automations/mymedia_webhook_receiver.yaml
 
 ---
 
-# Step 3 — Add Alexa Command Script
+### Step 3 — Add Alexa Command Script
 
 Used to send commands such as:
 
@@ -205,7 +216,7 @@ next
 stop
 ```
 
-# Step 4 — Add Lovelace Card
+### Step 4 — Add Lovelace Card
 
 Dashboard card YAML:
 
@@ -215,7 +226,7 @@ homeassistant/lovelace/mymedia_dashboard_card.yaml
 
 ---
 
-# Features
+## Features
 
 ## Launcher
 
@@ -252,7 +263,7 @@ Displays:
 
 ---
 
-# Notes
+## Notes
 
 ## Artwork Refresh
 
@@ -265,16 +276,8 @@ Use whatever Alexa device names your existing HA script supports.
 
 ---
 
-# Included Files
 
-- [Helpers](homeassistant/helpers.md)
-- [Webhook Automation](homeassistant/automations/mymedia_webhook_receiver.yaml)
-- [Alexa Command Script](homeassistant/scripts/issue_alexa_command.yaml)
-- [Dashboard Card](homeassistant/lovelace/mymedia_dashboard_card.yaml)
-
----
-
-# Credits
+## Credits
 
 * My Media for Alexa developer for webhook support
 * Home Assistant community
@@ -282,5 +285,4 @@ Use whatever Alexa device names your existing HA script supports.
 
 ---
 
-![Home Assistant](https://img.shields.io/badge/Home%20Assistant-Compatible-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
+

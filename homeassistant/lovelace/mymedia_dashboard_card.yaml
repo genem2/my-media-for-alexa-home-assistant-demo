@@ -1,1 +1,448 @@
+type: custom:stack-in-card
+mode: vertical
+cards:
+  - type: custom:button-card
+    entity: input_boolean.mymedia_playing
+    name: |
+      [[[
+        const device = states['input_text.mymedia_device']?.state || '';
+        return device && device !== 'unknown' ? `My Media • ${device}` : 'My Media';
+      ]]]
+    show_state: false
+    show_label: true
+    show_entity_picture: true
+    entity_picture: |
+      [[[
+        const art = states['input_text.mymedia_artwork_url']?.state || '';
+        const ts = states['input_datetime.mymedia_event_time']?.state || '';
+        if (!art || art === 'unknown') return '/local/images/MyMediaAlexa.png';
+        return `${art}&cb=${encodeURIComponent(ts)}`;
+      ]]]
+    label: |
+      [[[
+        const track = states['input_text.mymedia_track']?.state || '';
+        const artist = states['input_text.mymedia_artist']?.state || '';
+        const album = states['input_text.mymedia_album']?.state || '';
+        const playlist = states['input_text.mymedia_playlist']?.state || '';
+        const last = states['input_text.mymedia_last_event']?.state || '';
+        const err = states['input_text.mymedia_error']?.state || '';
 
+        const playing = states['input_boolean.mymedia_playing']?.state === 'on';
+        const paused = states['input_boolean.mymedia_paused']?.state === 'on';
+        const failed = states['input_boolean.mymedia_failed']?.state === 'on';
+
+        if (failed) {
+          return err && err !== 'unknown'
+            ? `Playback failed\n${err}`
+            : 'Playback failed';
+        }
+
+        let lines = [];
+        if (track && track !== 'unknown') lines.push(track);
+        if (artist && artist !== 'unknown') lines.push(`by ${artist}`);
+        if (album && album !== 'unknown') lines.push(`Album: ${album}`);
+        if (playlist && playlist !== 'unknown') lines.push(`Playlist: ${playlist}`);
+
+        if (!lines.length) {
+          if (paused) return 'Paused';
+          if (playing) return 'Playing';
+          if (last && last !== 'unknown') return `Idle\nLast event: ${last}`;
+          return 'Idle';
+        }
+
+        return lines.join('\n');
+      ]]]
+    icon: |
+      [[[
+        const failed = states['input_boolean.mymedia_failed']?.state === 'on';
+        const paused = states['input_boolean.mymedia_paused']?.state === 'on';
+        const playing = states['input_boolean.mymedia_playing']?.state === 'on';
+
+        if (failed) return 'mdi:alert-circle';
+        if (paused) return 'mdi:pause-circle';
+        if (playing) return 'mdi:music-circle';
+        return 'mdi:speaker-wireless';
+      ]]]
+    custom_fields:
+      status: |
+        [[[
+          const playing = states['input_boolean.mymedia_playing']?.state === 'on';
+          const paused = states['input_boolean.mymedia_paused']?.state === 'on';
+          const failed = states['input_boolean.mymedia_failed']?.state === 'on';
+          const last = states['input_text.mymedia_last_event']?.state || '';
+          const when = states['input_datetime.mymedia_event_time']?.state || '';
+
+          let badge = 'Idle';
+          if (failed) badge = 'Failed';
+          else if (paused) badge = 'Paused';
+          else if (playing || last === 'track_start' || last === 'playlist_start') badge = 'Playing';
+
+          let line = `<span style="
+            display:inline-block;
+            padding:4px 10px;
+            border-radius:999px;
+            background:rgba(255,255,255,0.18);
+            font-size:12px;
+            font-weight:600;
+            margin-right:8px;
+          ">${badge}</span>`;
+
+          if (last && last !== 'unknown') {
+            line += `<span style="opacity:.92">Event: ${last}</span>`;
+          }
+
+          if (when && when !== 'unknown') {
+            line += `<div style="margin-top:6px; opacity:.82; font-size:11px;">Updated: ${when}</div>`;
+          }
+
+          return line;
+        ]]]
+      launcher:
+        card:
+          type: custom:button-card
+          show_icon: false
+          show_name: false
+          show_label: false
+          styles:
+            card:
+              - padding: 0
+              - margin: 0
+              - background: none
+              - box-shadow: none
+              - border: none
+            grid:
+              - grid-template-areas: "\"mode query device go\""
+              - grid-template-columns: 1.05fr 1.5fr 1.05fr 58px
+              - column-gap: 6px
+              - align-items: stretch
+          custom_fields:
+            mode:
+              card:
+                type: custom:button-card
+                entity: input_select.mymedia_mode
+                show_icon: false
+                show_state: true
+                name: Mode
+                tap_action:
+                  action: more-info
+                styles:
+                  card:
+                    - height: 48px
+                    - border-radius: 12px
+                    - padding: 4px 8px
+                    - box-shadow: none
+                    - background: rgba(255,255,255,0.14)
+                  grid:
+                    - grid-template-areas: "\"n\" \"s\""
+                    - grid-template-columns: 1fr
+                    - grid-template-rows: min-content 1fr
+                  name:
+                    - font-size: 10px
+                    - font-weight: 500
+                    - color: rgba(255,255,255,0.82)
+                    - justify-self: center
+                    - align-self: end
+                  state:
+                    - font-size: 11px
+                    - font-weight: 600
+                    - color: white
+                    - justify-self: center
+                    - align-self: start
+            query:
+              card:
+                type: custom:button-card
+                entity: input_text.mymedia_query
+                show_icon: false
+                show_state: true
+                name: Search
+                tap_action:
+                  action: more-info
+                styles:
+                  card:
+                    - height: 48px
+                    - border-radius: 12px
+                    - padding: 4px 8px
+                    - box-shadow: none
+                    - background: rgba(255,255,255,0.14)
+                  grid:
+                    - grid-template-areas: "\"n\" \"s\""
+                    - grid-template-columns: 1fr
+                    - grid-template-rows: min-content 1fr
+                  name:
+                    - font-size: 10px
+                    - font-weight: 500
+                    - color: rgba(255,255,255,0.82)
+                    - justify-self: start
+                    - align-self: end
+                  state:
+                    - font-size: 11px
+                    - font-weight: 600
+                    - color: white
+                    - justify-self: start
+                    - align-self: start
+                    - text-align: left
+                    - white-space: nowrap
+                    - overflow: hidden
+                    - text-overflow: ellipsis
+            device:
+              card:
+                type: custom:button-card
+                entity: input_select.alexa_device
+                show_icon: false
+                show_state: true
+                name: Device
+                tap_action:
+                  action: more-info
+                styles:
+                  card:
+                    - height: 48px
+                    - border-radius: 12px
+                    - padding: 4px 8px
+                    - box-shadow: none
+                    - background: rgba(255,255,255,0.14)
+                  grid:
+                    - grid-template-areas: "\"n\" \"s\""
+                    - grid-template-columns: 1fr
+                    - grid-template-rows: min-content 1fr
+                  name:
+                    - font-size: 10px
+                    - font-weight: 500
+                    - color: rgba(255,255,255,0.82)
+                    - justify-self: center
+                    - align-self: end
+                  state:
+                    - font-size: 11px
+                    - font-weight: 600
+                    - color: white
+                    - justify-self: center
+                    - align-self: start
+            go:
+              card:
+                type: custom:button-card
+                name: Go
+                icon: mdi:play
+                show_state: false
+                tap_action:
+                  action: call-service
+                  service: script.issue_alexa_command
+                  data:
+                    command: |
+                      [[[
+                        const mode = states['input_select.mymedia_mode']?.state || 'play';
+                        const q = states['input_text.mymedia_query']?.state || '';
+                        if (!q.trim()) return '';
+                        return `ask My Media to ${mode} ${q}`;
+                      ]]]
+                    device: |
+                      [[[
+                        return states['input_select.alexa_device']?.state || 'media_player.oak';
+                      ]]]
+                    this_caller: lovelace_mymedia_launcher
+                    seconds_delay_afterwards: 8
+                styles:
+                  card:
+                    - height: 48px
+                    - border-radius: 12px
+                    - padding: 2px
+                    - box-shadow: none
+                    - background: rgba(255,255,255,0.18)
+                  grid:
+                    - grid-template-areas: "\"i\" \"n\""
+                    - grid-template-columns: 1fr
+                    - grid-template-rows: 1fr min-content
+                  icon:
+                    - width: 18px
+                    - height: 18px
+                    - color: white
+                  name:
+                    - color: white
+                    - font-size: 11px
+                    - font-weight: 700
+                    - padding-bottom: 4px
+    styles:
+      card:
+        - border-radius: 24px
+        - border: none
+        - padding: 16px
+        - box-shadow: 0 10px 28px rgba(0,0,0,0.28)
+        - background: |
+            [[[
+              const playing = states['input_boolean.mymedia_playing']?.state === 'on';
+              const paused = states['input_boolean.mymedia_paused']?.state === 'on';
+              const failed = states['input_boolean.mymedia_failed']?.state === 'on';
+
+              if (failed) return 'linear-gradient(135deg, rgba(183,28,28,0.96), rgba(123,31,162,0.90))';
+              if (paused) return 'linear-gradient(135deg, rgba(255,152,0,0.94), rgba(121,85,72,0.92))';
+              if (playing) return 'linear-gradient(135deg, rgba(67,160,71,0.96), rgba(3,169,244,0.92))';
+              return 'linear-gradient(135deg, rgba(88,101,242,0.95), rgba(0,188,212,0.88))';
+            ]]]
+      grid:
+        - grid-template-areas: "\"i n\" \"i l\" \"status status\" \"launcher launcher\""
+        - grid-template-columns: 92px 1fr
+        - grid-template-rows: min-content 1fr min-content min-content
+        - column-gap: 14px
+        - row-gap: 8px
+      img_cell:
+        - width: 92px
+        - height: 92px
+        - align-self: start
+        - justify-self: center
+        - border-radius: 18px
+        - overflow: hidden
+        - background: rgba(255,255,255,0.12)
+      entity_picture:
+        - width: 92px
+        - height: 92px
+        - border-radius: 18px
+      name:
+        - color: white
+        - font-size: 21px
+        - font-weight: 700
+        - justify-self: start
+        - align-self: end
+        - text-align: left
+      label:
+        - color: rgba(255,255,255,0.94)
+        - font-size: 13px
+        - line-height: 1.35
+        - justify-self: start
+        - align-self: start
+        - text-align: left
+        - white-space: normal
+      icon:
+        - color: white
+        - width: 34px
+        - height: 34px
+      custom_fields:
+        status:
+          - color: white
+          - text-align: left
+          - padding-top: 4px
+        launcher:
+          - padding-top: 2px
+  - type: horizontal-stack
+    cards:
+      - type: custom:button-card
+        name: Pause
+        icon: mdi:pause
+        tap_action:
+          action: call-service
+          service: script.issue_alexa_command
+          data:
+            command: pause
+            device: |
+              [[[
+                const d = states['input_text.mymedia_device']?.state || '';
+                return (d && d !== 'unknown') ? d : 'Office';
+              ]]]
+            this_caller: lovelace_mymedia_pause_webhook
+            seconds_delay_afterwards: 4
+        styles:
+          card:
+            - height: 34px
+            - border-radius: 12px
+            - padding: 4px
+            - box-shadow: none
+          grid:
+            - grid-template-areas: "\"i n\""
+            - grid-template-columns: 18px auto
+            - column-gap: 6px
+          icon:
+            - width: 16px
+            - height: 16px
+          name:
+            - font-size: 11px
+            - align-self: center
+      - type: custom:button-card
+        name: Resume
+        icon: mdi:play
+        tap_action:
+          action: call-service
+          service: script.issue_alexa_command
+          data:
+            command: resume
+            device: |
+              [[[
+                const d = states['input_text.mymedia_device']?.state || '';
+                return (d && d !== 'unknown') ? d : 'Office';
+              ]]]
+            this_caller: lovelace_mymedia_resume_webhook
+            seconds_delay_afterwards: 4
+        styles:
+          card:
+            - height: 34px
+            - border-radius: 12px
+            - padding: 4px
+            - box-shadow: none
+          grid:
+            - grid-template-areas: "\"i n\""
+            - grid-template-columns: 18px auto
+            - column-gap: 6px
+          icon:
+            - width: 16px
+            - height: 16px
+          name:
+            - font-size: 11px
+            - align-self: center
+      - type: custom:button-card
+        name: Next
+        icon: mdi:skip-next
+        tap_action:
+          action: call-service
+          service: script.issue_alexa_command
+          data:
+            command: next
+            device: |
+              [[[
+                const d = states['input_text.mymedia_device']?.state || '';
+                return (d && d !== 'unknown') ? d : 'Office';
+              ]]]
+            this_caller: lovelace_mymedia_next_webhook
+            seconds_delay_afterwards: 4
+        styles:
+          card:
+            - height: 34px
+            - border-radius: 12px
+            - padding: 4px
+            - box-shadow: none
+          grid:
+            - grid-template-areas: "\"i n\""
+            - grid-template-columns: 18px auto
+            - column-gap: 6px
+          icon:
+            - width: 16px
+            - height: 16px
+          name:
+            - font-size: 11px
+            - align-self: center
+      - type: custom:button-card
+        name: Stop
+        icon: mdi:stop-circle
+        tap_action:
+          action: call-service
+          service: script.issue_alexa_command
+          data:
+            command: stop
+            device: |
+              [[[
+                const d = states['input_text.mymedia_device']?.state || '';
+                return (d && d !== 'unknown') ? d : 'Office';
+              ]]]
+            this_caller: lovelace_mymedia_stop_webhook
+            seconds_delay_afterwards: 4
+        styles:
+          card:
+            - height: 34px
+            - border-radius: 12px
+            - padding: 4px
+            - box-shadow: none
+          grid:
+            - grid-template-areas: "\"i n\""
+            - grid-template-columns: 18px auto
+            - column-gap: 6px
+          icon:
+            - width: 16px
+            - height: 16px
+          name:
+            - font-size: 11px
+            - align-self: center
